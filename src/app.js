@@ -1,25 +1,10 @@
 const express = require("express");
 
 const app = express();
-const {adminAuth, userAuth} = require("./middlewares/auth")
 
-app.use("/admin", adminAuth);
+const {connectDB} = require("./config/database")
 
-app.get("/admin/getAllData", (req, res) => {
-    console.log("Getting All data, admin route");
-    res.send("Get all data");
-})
-
-app.use("/user", userAuth);
-
-app.get("/user/deleteUserData", (req, res)=>{
-    console.log("Deleting DataTransfer, user route");
-    res.send("Delete data");
-})
-
-
-
-
+connectDB();
 
 
 app.listen(7777, () => {
