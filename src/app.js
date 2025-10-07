@@ -2,19 +2,31 @@ const express = require("express");
 
 const app = express();
 
-// app.use("/user", (req, res)=>{
-//     res.send("HAHAHAHAHAHAHHAHAHAHA");
-// });
 
-app.get("/abc", (req, res) => {
-  console.log(req.query);
-  res.send({ firstName: "Natansh", lastName: "Khurana" });
-});
 
-app.get("/user/:userId/:name/:password", (req, res)=>{
-    console.log(req.params);
-    
-    res.send("getting dynamic routes");
+// app.get("/user",(req, res, next)=>{
+//     console.log("handling route user 1 !!");
+//     res.send("response 1");
+//     next();
+// }, (req, res) => {
+//     console.log("Handling route user 2 !!");
+//     res.send("response 2"); 
+// }, (req, res) => {
+//     console.log("Handling route user 3 !!");
+//     res.send("response 3");
+// })
+
+app.get("/user",(req, res, next)=>{
+    console.log("handling route user 1 !!");
+    res.send("response 1");
+    next();
+}, (req, res, next) => {
+    console.log("Handling route user 2 !!");
+    // res.send("response 2");
+    next();
+}, (req, res) => {
+    console.log("Handling route user 3 !!");
+    // res.send("response 3");
 })
 
 app.listen(7777, () => {
