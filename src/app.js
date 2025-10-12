@@ -6,17 +6,16 @@ const { connectDB } = require("./config/database");
 const User = require("./models/users");
 app.use(express.json());
 
-// app.post("/signup", async (req, res)=>{
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body);
 
-//     const user = new User(req.body);
-
-//     try{
-//         await user.save();
-//         res.send("User added successfully");
-//     }catch(err){
-//         res.status(400).send("error ocurred in connecting database" + err.message);
-//     }
-// })
+  try {
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("error ocurred in connecting database" + err.message);
+  }
+});
 
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
@@ -46,16 +45,24 @@ app.delete("/user", async (req, res) => {
 
 // Update data of the user
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body?.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(userId, data, {returnDocument:"after"});
+    const allowed_updates = ["firstName", "lastName", "age", "about", "photoURL", "gender"];
+    const isUpdateAllowed = Object.keys(data).every(k => allowed_updates.includes(k));
+    if(!isUpdateAllowed){
+        throw new Error("Updating some fields not allowed");
+    }
+    const user = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     console.log(user);
     res.send("user updated successfully");
   } catch (err) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Something went wrong " + err.message);
   }
 });
 
