@@ -45,26 +45,45 @@ app.delete("/user", async (req, res) => {
 
 // Update data of the user
 
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
+// app.patch("/user/:userId", async (req, res) => {
+//   const userId = req.params?.userId;
+//   const data = req.body;
 
-  try {
-    const allowed_updates = ["firstName", "lastName", "age", "about", "photoURL", "gender"];
-    const isUpdateAllowed = Object.keys(data).every(k => allowed_updates.includes(k));
-    if(!isUpdateAllowed){
-        throw new Error("Updating some fields not allowed");
+//   try {
+//     const allowed_updates = ["firstName", "lastName", "age", "about", "photoURL", "gender"];
+//     const isUpdateAllowed = Object.keys(data).every(k => allowed_updates.includes(k));
+//     if(!isUpdateAllowed){
+//         throw new Error("Updating some fields not allowed");
+//     }
+//     const user = await User.findByIdAndUpdate(userId, data, {
+//       returnDocument: "after",
+//       runValidators: true,
+//     });
+//     console.log(user);
+//     res.send("user updated successfully");
+//   } catch (err) {
+//     res.status(400).send("Something went wrong " + err.message);
+//   }
+// });
+
+app.patch("/user", async (req, res) => {
+    const {emailId , ...data} = req.body;
+
+    try{
+        const canUpdate = ["firstName", "lastName", "age", "about", "photoURL", "gender","emailId"];
+        const isAllowUpdate = Object.keys(data).every(k => canUpdate.includes(k));
+        if(!isAllowUpdate){
+            throw new Error("Can't update some fields.");
+        }
+        const user = await User.findOneAndUpdate({emailId : emailId},data,{
+            returnDocument:"after",
+        })
+        console.log(user);
+        res.send("Updated Successfully");
+    }catch(err){
+        res.status(400).send("Something went wrong " + err.message);
     }
-    const user = await User.findByIdAndUpdate(userId, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    console.log(user);
-    res.send("user updated successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong " + err.message);
-  }
-});
+})
 
 // The right way of connecting to database means database will be connected first and then server will be started if database is not connected it will give error
 connectDB()
